@@ -1,0 +1,35 @@
+[
+  {
+    "id": 1,
+    "username": "testuser",
+    "password": "password",
+    "character": {
+      "name": "Jules",
+      "job": "Knight",
+      "level": 1,
+      "xp": 0,
+      "stats": {
+        "hp": 100,
+        "mp": 50,
+        "attack": 12,
+        "defense": 6,
+        "magic": 5,
+        "spirit": 5,
+        "luck": 5,
+        "vitality": 5
+      },
+      "position": {
+        "x": 11,
+        "y": 11
+      },
+      "inventory": [],
+      "equipment": {
+        "weapon": null,
+        "shield": null,
+        "helmet": null,
+        "armor": null,
+        "accessory": null
+      }
+    }
+  }
+]

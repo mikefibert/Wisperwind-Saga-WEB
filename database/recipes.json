@@ -1,0 +1,40 @@
+[
+    {
+        "id": 1,
+        "name": "Basic Potion",
+        "type": "brewing",
+        "result": { "itemId": 201, "quantity": 1 },
+        "ingredients": [
+            { "itemId": 1, "quantity": 2 }
+        ]
+    },
+    {
+        "id": 2,
+        "name": "Leather Shield",
+        "type": "crafting",
+        "result": { "itemId": 103, "quantity": 1 },
+        "ingredients": [
+            { "itemId": 3, "quantity": 3 }
+        ]
+    },
+    {
+        "id": 3,
+        "name": "Iron Sword",
+        "type": "crafting",
+        "result": { "itemId": 104, "quantity": 1 },
+        "ingredients": [
+            { "itemId": 13, "quantity": 2 },
+            { "itemId": 4, "quantity": 5 }
+        ]
+    },
+    {
+        "id": 4,
+        "name": "Scale Mail",
+        "type": "crafting",
+        "result": { "itemId": 105, "quantity": 1 },
+        "ingredients": [
+            { "itemId": 12, "quantity": 5 },
+            { "itemId": 16, "quantity": 2 }
+        ]
+    }
+]

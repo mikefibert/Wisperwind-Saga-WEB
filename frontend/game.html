@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wisperwind Saga - Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="map-container">
+            <!-- Map grid will be generated here by JavaScript -->
+        </div>
+        <div id="player-info">
+            <h2>Player Info</h2>
+            <div id="character-profile"></div>
+            <div id="backpack"></div>
+        </div>
+        <div id="chat-container">
+            <div id="chat-messages"></div>
+            <input type="text" id="chat-input" placeholder="Type a message...">
+        </div>
+    </div>
+
+    <div id="combat-container" style="display: none;">
+        <div id="combat-monster">
+            <h2 id="monster-name"></h2>
+            <p>HP: <span id="monster-hp"></span></p>
+        </div>
+        <div id="combat-player">
+            <h2 id="player-name"></h2>
+            <p>HP: <span id="player-hp"></span></p>
+        </div>
+        <div id="combat-actions">
+            <button id="attack-btn">Attack</button>
+            <button>Skills</button>
+            <button>Items</button>
+            <button>Flee</button>
+        </div>
+        <div id="combat-log"></div>
+    </div>
+
+    <div id="crafting-container" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Crafting</h2>
+            <div id="recipe-list"></div>
+        </div>
+    </div>
+
+    <script src="client.js"></script>
+</body>
+</html>
