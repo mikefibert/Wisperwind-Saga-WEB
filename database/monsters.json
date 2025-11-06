@@ -1,0 +1,40 @@
+[
+    {
+        "id": 1,
+        "name": "Slime",
+        "level": 1,
+        "hp": 20,
+        "attack": 5,
+        "defense": 2,
+        "element": "Water",
+        "drops": [
+            { "itemId": 1, "chance": 0.8 },
+            { "itemId": 101, "chance": 0.1 }
+        ]
+    },
+    {
+        "id": 2,
+        "name": "Forest Bat",
+        "level": 2,
+        "hp": 25,
+        "attack": 8,
+        "defense": 3,
+        "element": "Wind",
+        "drops": [
+            { "itemId": 2, "chance": 0.5 }
+        ]
+    },
+    {
+        "id": 3,
+        "name": "Wild Boar",
+        "level": 3,
+        "hp": 40,
+        "attack": 12,
+        "defense": 5,
+        "element": "Earth",
+        "drops": [
+            { "itemId": 3, "chance": 0.7 },
+            { "itemId": 102, "chance": 0.15 }
+        ]
+    }
+]

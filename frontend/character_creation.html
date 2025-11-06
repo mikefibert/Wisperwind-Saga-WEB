@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wisperwind Saga - Create Character</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="character-creation-container">
+        <h1>Create Your Character</h1>
+        <form id="character-form">
+            <input type="text" id="char-name" placeholder="Character Name" required>
+
+            <label for="job-select">Choose your Job:</label>
+            <select id="job-select">
+                <option value="Knight">Knight (+2 Attack, +1 Defense)</option>
+                <option value="Mage">Mage (+3 Magic, +0 Defense)</option>
+                <option value="Tanker">Tanker (+0 Attack, +3 Defense)</option>
+                <option value="Healer">Healer (+1 Magic, +2 Spirit)</option>
+                <option value="Farmer">Farmer (+1 Luck, +1 Vitality)</option>
+            </select>
+
+            <button type="submit">Create Character</button>
+        </form>
+    </div>
+
+    <script src="client.js"></script>
+</body>
+</html>

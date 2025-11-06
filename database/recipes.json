@@ -1,0 +1,20 @@
+[
+    {
+        "id": 1,
+        "name": "Basic Potion",
+        "type": "brewing",
+        "result": { "itemId": 201, "quantity": 1 },
+        "ingredients": [
+            { "itemId": 1, "quantity": 2 }
+        ]
+    },
+    {
+        "id": 2,
+        "name": "Leather Shield",
+        "type": "crafting",
+        "result": { "itemId": 103, "quantity": 1 },
+        "ingredients": [
+            { "itemId": 3, "quantity": 3 }
+        ]
+    }
+]

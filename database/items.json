@@ -1,0 +1,9 @@
+[
+    { "id": 1, "name": "Slime Gel", "type": "material" },
+    { "id": 2, "name": "Bat Wing", "type": "material" },
+    { "id": 3, "name": "Boar Hide", "type": "material" },
+    { "id": 101, "name": "Rusty Sword", "type": "weapon", "attack": 5 },
+    { "id": 102, "name": "Wooden Shield", "type": "armor", "defense": 3 },
+    { "id": 103, "name": "Leather Shield", "type": "armor", "defense": 5 },
+    { "id": 201, "name": "Basic Potion", "type": "consumable", "effect": "heal_hp", "value": 50 }
+]
