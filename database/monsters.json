@@ -36,5 +36,20 @@
             { "itemId": 3, "chance": 0.7 },
             { "itemId": 102, "chance": 0.15 }
         ]
-    }
+    },
+    { "id": 4, "name": "Mountain Goblin", "level": 5, "hp": 60, "attack": 15, "defense": 8, "element": "Earth", "drops": [{ "itemId": 4, "chance": 0.6 }] },
+    { "id": 5, "name": "Harpy", "level": 6, "hp": 55, "attack": 18, "defense": 6, "element": "Wind", "drops": [{ "itemId": 5, "chance": 0.5 }] },
+    { "id": 6, "name": "Stone Golem", "level": 8, "hp": 100, "attack": 14, "defense": 20, "element": "Earth", "drops": [{ "itemId": 6, "chance": 0.2 }] },
+    { "id": 7, "name": "Giant Leech", "level": 4, "hp": 45, "attack": 10, "defense": 10, "element": "Water", "drops": [{ "itemId": 7, "chance": 0.8 }] },
+    { "id": 8, "name": "Will-o'-Wisp", "level": 5, "hp": 30, "attack": 20, "defense": 5, "element": "Fire", "drops": [{ "itemId": 8, "chance": 0.4 }] },
+    { "id": 9, "name": "Treant Sapling", "level": 4, "hp": 70, "attack": 11, "defense": 12, "element": "Earth", "drops": [{ "itemId": 9, "chance": 0.5 }] },
+    { "id": 10, "name": "Giant Crab", "level": 3, "hp": 35, "attack": 14, "defense": 15, "element": "Water", "drops": [{ "itemId": 10, "chance": 0.6 }] },
+    { "id": 11, "name": "Gryphon Hatchling", "level": 9, "hp": 80, "attack": 25, "defense": 15, "element": "Wind", "drops": [{ "itemId": 11, "chance": 0.15 }] },
+    { "id": 12, "name": "Swamp Serpent", "level": 7, "hp": 65, "attack": 22, "defense": 10, "element": "Water", "drops": [{ "itemId": 12, "chance": 0.3 }] },
+    { "id": 13, "name": "Orc Grunt", "level": 6, "hp": 80, "attack": 19, "defense": 9, "element": "Earth", "drops": [{ "itemId": 13, "chance": 0.5 }] },
+    { "id": 14, "name": "Shadow Stalker", "level": 10, "hp": 90, "attack": 30, "defense": 12, "element": "Dark", "drops": [{ "itemId": 14, "chance": 0.2 }] },
+    { "id": 15, "name": "Ice Elemental", "level": 8, "hp": 75, "attack": 25, "defense": 18, "element": "Ice", "drops": [{ "itemId": 15, "chance": 0.4 }] },
+    { "id": 16, "name": "Fire Drake", "level": 12, "hp": 120, "attack": 35, "defense": 20, "element": "Fire", "drops": [{ "itemId": 16, "chance": 0.1 }] },
+    { "id": 17, "name": "Dire Wolf", "level": 5, "hp": 60, "attack": 20, "defense": 8, "element": "Earth", "drops": [{ "itemId": 17, "chance": 0.6 }] },
+    { "id": 18, "name": "Forest Pixie", "level": 2, "hp": 20, "attack": 5, "defense": 2, "element": "Light", "drops": [{ "itemId": 18, "chance": 0.9 }] }
 ]

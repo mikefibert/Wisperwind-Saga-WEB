@@ -1,2 +1,5 @@
 # Dependencies
 backend/node_modules/
+
+# Logs
+server.log

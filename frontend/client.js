@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert(result.message);
 
             if (response.ok && result.redirectTo) {
+                localStorage.setItem('wisperwind-token', result.token);
                 window.location.href = result.redirectTo;
             }
         });
@@ -75,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const response = await fetch('/api/character', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify({ name, job })
             });
 
@@ -91,6 +92,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const mapContainer = document.getElementById('map-container');
     if (mapContainer) {
         let currentPlayer = null;
+
+        const getAuthHeaders = () => {
+            const token = localStorage.getItem('wisperwind-token');
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            };
+        };
 
         const renderMap = (mapData) => {
             mapContainer.innerHTML = '';
@@ -144,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const handleMove = async (x, y) => {
             const response = await fetch('/api/player/move', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify({ x, y })
             });
             const result = await response.json();
@@ -174,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('attack-btn').onclick = async () => {
                 const response = await fetch('/api/combat/action', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify({ action: 'attack' })
                 });
                 const result = await response.json();
@@ -214,11 +223,11 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const initializeGame = async () => {
-            const playerResponse = await fetch('/api/player/data');
+            const playerResponse = await fetch('/api/player/data', { headers: getAuthHeaders() });
             currentPlayer = await playerResponse.json();
             updatePlayerProfile();
 
-            const mapResponse = await fetch('/api/map');
+            const mapResponse = await fetch('/api/map', { headers: getAuthHeaders() });
             const mapData = await mapResponse.json();
 
             renderMap(mapData);
@@ -289,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const recipeId = e.target.dataset.recipeId;
                     const craftResponse = await fetch('/api/craft', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: getAuthHeaders(),
                         body: JSON.stringify({ recipeId: parseInt(recipeId) })
                     });
                     const result = await craftResponse.json();

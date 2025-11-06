@@ -4,34 +4,42 @@ const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const WebSocket = require('ws');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const app = express();
+const JWT_SECRET = 'your_super_secret_key_for_wisperwind_saga'; // Should be in an env file in production
 const PORT = 3000;
 
 const DB_PATH = path.join(__dirname, '../database');
-const PLAYERS_FILE = path.join(DB_PATH, 'players.json');
+const PLAYERS_DIR = path.join(DB_PATH, 'players');
 const MAP_FILE = path.join(DB_PATH, 'map.json');
 const MONSTERS_FILE = path.join(DB_PATH, 'monsters.json');
 const ITEMS_FILE = path.join(DB_PATH, 'items.json');
 const RECIPES_FILE = path.join(DB_PATH, 'recipes.json');
 
-// Helper function to read players data
-const readPlayersData = () => {
+// Helper function to read a single player's data
+const readPlayerData = (username) => {
+    const playerFile = path.join(PLAYERS_DIR, `${username}.json`);
+    if (!fs.existsSync(playerFile)) {
+        return null;
+    }
     try {
-        const data = fs.readFileSync(PLAYERS_FILE, 'utf8');
+        const data = fs.readFileSync(playerFile, 'utf8');
         return JSON.parse(data);
     } catch (error) {
-        console.error("Error reading players data:", error);
-        return [];
+        console.error(`Error reading data for player ${username}:`, error);
+        return null;
     }
 };
 
-// Helper function to write players data
-const writePlayersData = (data) => {
+// Helper function to write a single player's data
+const writePlayerData = (username, data) => {
+    const playerFile = path.join(PLAYERS_DIR, `${username}.json`);
     try {
-        fs.writeFileSync(PLAYERS_FILE, JSON.stringify(data, null, 2));
+        fs.writeFileSync(playerFile, JSON.stringify(data, null, 2));
     } catch (error) {
-        console.error("Error writing players data:", error);
+        console.error(`Error writing data for player ${username}:`, error);
     }
 };
 
@@ -79,62 +87,74 @@ const readRecipesData = () => {
     }
 };
 
-let activeCombat = null; // Simple in-memory combat session
+let activeCombats = {}; // In-memory combat sessions, keyed by username
 
 // Middleware
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// API Routes
-app.post('/api/register', (req, res) => {
-    const { username, password } = req.body;
-    const players = readPlayersData();
+// Auth Middleware
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (token == null) return res.sendStatus(401);
 
-    if (players.find(p => p.username === username)) {
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) return res.sendStatus(403);
+        req.user = user;
+        next();
+    });
+};
+
+// API Routes
+app.post('/api/register', async (req, res) => {
+    const { username, password } = req.body;
+
+    if (readPlayerData(username)) {
         return res.status(400).json({ message: "Username already exists." });
     }
 
+    const saltRounds = 10;
+    const passwordHash = await bcrypt.hash(password, saltRounds);
+
     const newPlayer = {
-        id: players.length + 1,
         username,
-        password, // In a real app, you MUST hash passwords!
-        character: null // Character will be created in the next step
+        passwordHash,
+        character: null
     };
 
-    players.push(newPlayer);
-    writePlayersData(players);
+    writePlayerData(username, newPlayer);
 
     res.status(201).json({ message: "User registered successfully!" });
 });
 
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
-    const players = readPlayersData();
+    const playerData = readPlayerData(username);
 
-    const player = players.find(p => p.username === username && p.password === password);
+    if (!playerData) {
+        return res.status(401).json({ message: "Invalid username or password." });
+    }
 
-    if (player) {
-        // We'll use a simple session placeholder. In a real app, use express-session or JWT.
-        req.session = { userId: player.id };
+    const match = await bcrypt.compare(password, playerData.passwordHash);
 
-        if (player.character) {
-            res.status(200).json({ message: "Login successful!", redirectTo: '/game' });
+    if (match) {
+        const token = jwt.sign({ username: playerData.username }, JWT_SECRET, { expiresIn: '1h' });
+
+        if (playerData.character) {
+            res.status(200).json({ message: "Login successful!", redirectTo: '/game', token });
         } else {
-            res.status(200).json({ message: "Login successful! Please create a character.", redirectTo: '/character-creation' });
+            res.status(200).json({ message: "Login successful! Please create a character.", redirectTo: '/character-creation', token });
         }
     } else {
         res.status(401).json({ message: "Invalid username or password." });
     }
 });
 
-app.post('/api/character', (req, res) => {
-    // This is a placeholder for session management.
-    // const userId = req.session.userId;
-    // For now, let's just find the first user without a character.
-    // THIS IS NOT SAFE and for demonstration only.
-    const players = readPlayersData();
-    const player = players.find(p => !p.character);
-    if (!player) return res.status(404).json({ message: "Player not found or character already exists." });
+app.post('/api/character', authenticateToken, (req, res) => {
+    const player = readPlayerData(req.user.username);
+    if (!player) return res.status(404).json({ message: "Player not found." });
+    if (player.character) return res.status(400).json({ message: "Character already exists." });
 
     const { name, job } = req.body;
     let stats = { hp: 100, mp: 50, attack: 10, defense: 5, magic: 5, spirit: 5, luck: 5, vitality: 5 };
@@ -158,29 +178,24 @@ app.post('/api/character', (req, res) => {
         equipment: { weapon: null, shield: null, helmet: null, armor: null, accessory: null }
     };
 
-    writePlayersData(players);
+    writePlayerData(req.user.username, player);
     res.status(201).json({ message: "Character created successfully!", redirectTo: '/game' });
 });
 
-app.get('/api/player/data', (req, res) => {
-    // Placeholder for getting the logged-in player's data
-    const players = readPlayersData();
-    // In a real app, you would use req.session.userId to find the correct player
-    const player = players.find(p => p.character); // Find first player with a character
-    if (player) {
+app.get('/api/player/data', authenticateToken, (req, res) => {
+    const player = readPlayerData(req.user.username);
+    if (player && player.character) {
         res.status(200).json(player.character);
     } else {
         res.status(404).json({ message: "Player data not found." });
     }
 });
 
-app.post('/api/player/move', (req, res) => {
+app.post('/api/player/move', authenticateToken, (req, res) => {
     const { x, y } = req.body;
 
-    // Placeholder for session management
-    const players = readPlayersData();
-    const player = players.find(p => p.character);
-    if (!player) return res.status(404).json({ message: "Player not found." });
+    const player = readPlayerData(req.user.username);
+    if (!player || !player.character) return res.status(404).json({ message: "Player not found." });
 
     const currentPos = player.character.position;
     const distance = Math.abs(currentPos.x - x) + Math.abs(currentPos.y - y);
@@ -190,14 +205,14 @@ app.post('/api/player/move', (req, res) => {
     }
 
     player.character.position = { x, y };
-    writePlayersData(players);
+    writePlayerData(req.user.username, player);
 
     // Check for monster encounter
     const mapData = readMapData();
     const spawnArea = mapData.spawnAreas.find(area => area.coordinates.some(coord => coord.x === x && coord.y === y));
 
     let combat = null;
-    if (spawnArea && Math.random() < 0.5) { // 50% encounter chance
+    if (spawnArea && Math.random() < 0.5 && !activeCombats[req.user.username]) { // 50% encounter chance
         const monsters = readMonstersData();
         const possibleMonsterIds = spawnArea.monsterIds;
         const monsterId = possibleMonsterIds[Math.floor(Math.random() * possibleMonsterIds.length)];
@@ -206,11 +221,11 @@ app.post('/api/player/move', (req, res) => {
         // Create a copy for combat
         const monster = { ...monsterTemplate, currentHp: monsterTemplate.hp };
 
-        activeCombat = {
+        activeCombats[req.user.username] = {
             player: player.character,
             monster: monster
         };
-        combat = activeCombat;
+        combat = activeCombats[req.user.username];
     }
 
     res.status(200).json({
@@ -220,14 +235,15 @@ app.post('/api/player/move', (req, res) => {
     });
 });
 
-app.post('/api/combat/action', (req, res) => {
+app.post('/api/combat/action', authenticateToken, (req, res) => {
     const { action } = req.body;
+    const combatSession = activeCombats[req.user.username];
 
-    if (!activeCombat) {
-        return res.status(400).json({ message: "No active combat." });
+    if (!combatSession) {
+        return res.status(400).json({ message: "No active combat for this player." });
     }
 
-    const { player, monster } = activeCombat;
+    const { player, monster } = combatSession;
     const log = [];
 
     if (action === 'attack') {
@@ -251,7 +267,7 @@ app.post('/api/combat/action', (req, res) => {
             log.push(`\n${monster.name} is defeated!`);
 
             // Handle victory: XP
-            const xpGained = monster.level * 10; // Simple XP formula
+            const xpGained = monster.level * 10;
             player.xp += xpGained;
             log.push(`You gained ${xpGained} XP.`);
 
@@ -268,18 +284,17 @@ app.post('/api/combat/action', (req, res) => {
             });
 
             // Persist player changes
-            const players = readPlayersData();
-            const playerIndex = players.findIndex(p => p.id === player.id);
-            if (playerIndex !== -1) {
-                players[playerIndex].character = player;
-                writePlayersData(players);
+            const playerData = readPlayerData(req.user.username);
+            if (playerData) {
+                playerData.character = player;
+                writePlayerData(req.user.username, playerData);
             }
 
-            activeCombat = null; // End combat
+            delete activeCombats[req.user.username]; // End combat
         }
     }
 
-    res.status(200).json({ combat: activeCombat, log, updatedPlayer: player });
+    res.status(200).json({ combat: activeCombats[req.user.username], log, updatedPlayer: player });
 });
 
 app.get('/api/recipes', (req, res) => {
@@ -287,12 +302,11 @@ app.get('/api/recipes', (req, res) => {
     res.status(200).json(recipes);
 });
 
-app.post('/api/craft', (req, res) => {
+app.post('/api/craft', authenticateToken, (req, res) => {
     const { recipeId } = req.body;
 
-    const players = readPlayersData();
-    const player = players.find(p => p.character); // Placeholder for logged-in player
-    if (!player) return res.status(404).json({ message: "Player not found." });
+    const player = readPlayerData(req.user.username);
+    if (!player || !player.character) return res.status(404).json({ message: "Player not found." });
 
     const recipes = readRecipesData();
     const recipe = recipes.find(r => r.id === recipeId);
@@ -327,7 +341,7 @@ app.post('/api/craft', (req, res) => {
         }
     }
 
-    writePlayersData(players);
+    writePlayerData(req.user.username, player);
 
     res.status(200).json({ message: `Successfully crafted ${resultItem.name}!`, player: player.character });
 });
